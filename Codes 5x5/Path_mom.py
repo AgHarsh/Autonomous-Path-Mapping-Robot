@@ -3,7 +3,6 @@ import DJkistra
 
 
 def path_vec(src, end, index):
-    print("path_mom")
     arena_mom_x = np.load("arena_mom_x.npy")
     arena_mom_y = np.load("arena_mom_y.npy")
     avg_x = np.sum(arena_mom_x, axis=0)
@@ -31,7 +30,4 @@ def path_vec(src, end, index):
         x = path[i] % 5
         path_x.append(arena_mom_x[y][x])
         path_y.append(arena_mom_y[y][x])
-    print("path_x:", path_x, "\n", "path_y:", path_y)
     return path_x, path_y
-
-path_vec

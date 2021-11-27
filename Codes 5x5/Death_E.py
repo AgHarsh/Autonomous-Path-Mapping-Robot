@@ -2,12 +2,15 @@ import numpy as np
 import cv2
 
 
-def dabba():
-    im = cv2.imread("arena_Kmeans.jpg")     # Image for thresholding
+def generate_deatheater():
+    im = cv2.imread("arena_KMeans.jpg")     # Image for thresholding
+    shape = im.shape
+
     showCrosshair = False
     fromCenter = False
     hoc_bg = np.zeros([5, 5], dtype=int)
-    shape = im.shape
+    death_e = np.zeros([5, 5], dtype=int)
+    weapons = np.zeros([5, 5], dtype=int)
     hoc_bg[0][0] = 1
     hoc_bg[4][0] = 1
     hoc_bg[0][4] = 1
@@ -32,19 +35,15 @@ def dabba():
     kernel = np.ones((5, 5), np.uint8)
     maskBGR = cv2.erode(maskBGR, kernel, iterations=1)
     contours, hierarchy = cv2.findContours(maskBGR, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.imshow('erode_mask', maskBGR)
     for cnt in contours:
         M = cv2.moments(cnt)
         area = cv2.contourArea(cnt)
         if area > 1500:
             cv2.drawContours(im, [cnt], 0, 0, 3)
-            cv2.imshow("image", im)
             cx = int((int(M['m10'] / M['m00']) / shape[0]) * 5)
             cy = int((int(M['m01'] / M['m00']) / shape[1]) * 5)
             hoc_bg[cy][cx] = 1
     cv2.destroyAllWindows()"""
-    death_e = np.zeros([5, 5], dtype=int)
-    weapons = np.zeros([5, 5], dtype=int)
 
     r = cv2.selectROI("Image", im, fromCenter, showCrosshair)  # first time color selection
     imcrop = im[int(r[1]):int(r[1] + r[3]), int(r[0]):int(r[0] + r[2])]
@@ -65,22 +64,20 @@ def dabba():
     kernel = np.ones((5, 5), np.uint8)
     maskBGR = cv2.erode(maskBGR, kernel, iterations=1)
     contours, hierarchy = cv2.findContours(maskBGR, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.imshow('erode_mask', maskBGR)
     for cnt in contours:
         M = cv2.moments(cnt)
         area = cv2.contourArea(cnt)
         if area > 100:
             cv2.drawContours(im, [cnt], 0, 0, 3)
-            cv2.imshow("image", im)
             cx = int((int(M['m10'] / M['m00']) / shape[0]) * 5)
             cy = int((int(M['m01'] / M['m00']) / shape[1]) * 5)
             weapons[cy][cx] = 1
             if weapons[cy][cx] == hoc_bg[cy][cx]:
                 death_e[cy][cx] = 1
+    cv2.imshow("image", im)
     weapons = weapons - death_e
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    np.save("death_e", death_e)
     np.save("weapons", weapons)
     np.save("true_hoc", hoc_bg)
-    return death_e, weapons, hoc_bg
+    return death_e, weapons

@@ -3,14 +3,15 @@ import cv2
 from sklearn.cluster import KMeans
 
 
-def sab_kuch():
-    fromCenter = False
-    showCrosshair = False
+def refine_image():
+    # Resizing the main arena
     img = cv2.imread("arena.jpg")
-    r = cv2.selectROI("Image", img, fromCenter, showCrosshair)
-    np.save("roi_data", r)
+    roiData = cv2.selectROI("Image", img, fromCenter=False, showCrosshair=False)
+    np.save("roi_data", roiData)
     cv2.destroyAllWindows()
-    img = img[int(r[1]):int(r[1] + r[3]), int(r[0]):int(r[0] + r[2])]
+
+    # Applying KMeans for clustering multiple RGB values of same color
+    img = img[int(roiData[1]):int(roiData[1] + roiData[3]), int(roiData[0]):int(roiData[0] + roiData[2])]
     img_size = img.shape
     X = img.reshape(img_size[0] * img_size[1], img_size[2])
     km = KMeans(n_clusters=12)
@@ -21,4 +22,4 @@ def sab_kuch():
     cv2.imwrite('arena_KMeans.jpg', new_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    return r
+    return roiData

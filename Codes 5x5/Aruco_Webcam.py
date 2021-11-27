@@ -4,7 +4,7 @@ import Signal
 import time
 
 
-def photu_de(r, ser, cap):
+def capture(r, ser, cap):
     count = 0
     while True:
         ret, frame = cap.read()

@@ -2,8 +2,8 @@ import numpy as np
 import cv2
 
 
-def bhagwan():
-    im = cv2.imread("arena_Kmeans.jpg")     # Image for thresholding
+def generate_arena():
+    im = cv2.imread("arena_KMeans.jpg")     # Image for thresholding
 
     showCrosshair = False
     fromCenter = False
@@ -21,8 +21,8 @@ def bhagwan():
         imcropmax = [imcrop[:, :, 0].max(), imcrop[:, :, 1].max(), imcrop[:, :, 2].max()]
         imcrop1min = [imcrop1[:, :, 0].min(), imcrop1[:, :, 1].min(), imcrop1[:, :, 2].min()]
         imcrop1max = [imcrop1[:, :, 0].max(), imcrop1[:, :, 1].max(), imcrop1[:, :, 2].max()]
-
-        thresh = 25  # for having corr0ect range of colors
+        cv2.destroyAllWindows()
+        thresh = 25  # for having correct range of colors
         minBGR = np.array([min(imcropmin[0], imcrop1min[0]) - thresh, min(imcropmin[1], imcrop1min[1]) - thresh,
                            min(imcropmin[2], imcrop1min[2]) - thresh])
         maxBGR = np.array([max(imcropmax[0], imcrop1max[0]) + thresh, max(imcropmax[1], imcrop1max[1]) + thresh,
@@ -31,17 +31,16 @@ def bhagwan():
             np.save("Red_Range", [minBGR, maxBGR])
         elif i == 1:
             np.save("Yellow_Range", [minBGR, maxBGR])
+
         maskBGR = cv2.inRange(im, minBGR, maxBGR)
         kernel = np.ones((5, 5), np.uint8)
         maskBGR = cv2.erode(maskBGR, kernel, iterations=1)
         contours, hierarchy = cv2.findContours(maskBGR, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.imshow('erode_mask', maskBGR)
         for cnt in contours:
             M = cv2.moments(cnt)
             area = cv2.contourArea(cnt)
             if area > 100:
                 cv2.drawContours(im, [cnt], 0, 0, 3)
-                cv2.imshow("image", im)
                 x, y, w, h = cv2.boundingRect(cnt)
                 rect_area = w * h
                 extent = float(area) / rect_area
@@ -62,13 +61,9 @@ def bhagwan():
                 arena[cy][cx] = j
                 arena_mom_x[cy][cx] = M['m10'] / M['m00']
                 arena_mom_y[cy][cx] = M['m01'] / M['m00']
-        cv2.destroyAllWindows()
+    cv2.imshow("Arena", im)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    print(arena)
-    np.save("arena", arena)
     np.save("arena_mom_x", arena_mom_x)
     np.save("arena_mom_y", arena_mom_y)
-    return arena, arena_mom_x, arena_mom_y, shape
-
-bhagwan()
+    return arena, shape

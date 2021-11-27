@@ -39,8 +39,7 @@ class Graph:
 
 
 def give_path(src, end, index):
-    print("DJkistra")
-    g = Graph_gen.baap_baap(index)
+    g = Graph_gen.generate_graph(index)
     path = []
     Graph().dijkstra(g, src, end, path)
     print(path)
